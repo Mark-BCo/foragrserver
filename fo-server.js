@@ -8,14 +8,14 @@ const { logger, logEvents } = require('./middleware/log');
 const errorHandler = require('./middleware/errorHandler');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
-// const corsOptions = require('./configuration/corsOptions');
+const corsOptions = require('./configuration/corsOptions');
 const connectDB = require('./configuration/dbConn');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3500
 connectDB();
 
 app.use(logger);
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/', express.static(path.join(__dirname, 'fo-public')));
