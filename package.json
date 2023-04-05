@@ -4,8 +4,8 @@
   "description": "Build and deploy a web appliaction for Foragr",
   "main": "fo-server.js",
   "scripts": {
-    "start": "node fo-server.js",
-    "dev": "nodemon fo-server.js"
+    "start": "node fo-server",
+    "dev": "nodemon fo-server"
   },
   "keywords": [],
   "author": "",
