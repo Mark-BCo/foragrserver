@@ -7,7 +7,7 @@ const multer = require('multer')
 // Storing the photo uploads in the disk storage
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, './public/css/uploads/')
+        cb(null, './public/uploads/')
     },
     filename: (req, file, cb) => {
         cb(null, file.originalname)
