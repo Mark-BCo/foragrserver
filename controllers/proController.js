@@ -2,6 +2,7 @@ const Pro = require('../models/prouser')
 const asyncHandler = require('express-async-handler');
 const bcrypt = require('bcrypt');
 
+// To sign up as an organistation
 
 const getAllPros = asyncHandler(async (req, res) => {
     const pros = await Pro.find().select('-password').lean();

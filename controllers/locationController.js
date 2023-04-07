@@ -17,9 +17,8 @@ const storage = multer.diskStorage({
 // returning the multer instance - multer is used in the createNewLocation function for uploding photos
 const upload = multer({ storage: storage })
 
-// @desc get all users
-// @route method:GET endpoint:/user
-// @access Private
+// @desc get all locations
+// @route method:GET /locations
 const getAllLocations = asyncHandler(async (req, res) => {
     const locations = await Location.find().select().lean();
     if (!locations?.length) {
@@ -28,6 +27,8 @@ const getAllLocations = asyncHandler(async (req, res) => {
     res.json(locations);
 })
 
+// @desc get last entered location
+// @route method:GET /locations/last
 const getLastLocation = asyncHandler(async (req, res) => {
 
     const last = await Location.find().sort({ $natural: -1 }).limit(1)
@@ -37,12 +38,11 @@ const getLastLocation = asyncHandler(async (req, res) => {
     }
 
     res.json(last);
-})
+}) //UNUSED
 
 
 // @desc create new location
 // @route method:POST endpoint:/locations
-// @access Private
 const createNewLocation = asyncHandler(async (req, res) => {
 
     // File Upload promise
@@ -59,7 +59,7 @@ const createNewLocation = asyncHandler(async (req, res) => {
     // location body
     const { username, name, location, commonname } = req.body
 
-
+    // Testing Only
     // const a = (typeof name)
     // const b = (typeof location)
     // const c = (typeof commonname)
@@ -69,9 +69,6 @@ const createNewLocation = asyncHandler(async (req, res) => {
 
     // Split the location array into latitude and longitude
     const [latitude, longitude] = location.split(',').map(coord => Number(coord.trim()));
-
-    // console.log(latitude)
-    // console.log(longitude)
 
     // Create a new location model
     const newLocation = await Location.create({
@@ -88,7 +85,6 @@ const createNewLocation = asyncHandler(async (req, res) => {
         },
     })
 
-    // console.log(newLocation)
     // return the reponse
     res.status(201).json(newLocation)
 
@@ -107,7 +103,7 @@ const deleteAllLocations = asyncHandler(async (req, res) => {
 
 })
 
-// Unused
+// In development
 const getPlantNameLocation = asyncHandler(async (req, res) => {
 
     const locations = await Location.find().select().lean();

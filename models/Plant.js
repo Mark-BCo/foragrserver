@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// Plant data model - think of the differnt types of data we need to store
 const plantSchema = new mongoose.Schema ({
     commonname: {
         type: String,

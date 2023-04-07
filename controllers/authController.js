@@ -1,35 +1,32 @@
 const bcrypt = require('bcrypt')
-// Signature encryption to share security between the client side and server side
 const jwt = require('jsonwebtoken')
 const asyncHandler = require('express-async-handler')
-
-// The User Model Schema
 const User = {
     users: require('../models/user'),
     setUsers: function (data) {this.users = data}
 }
 
-// @desc LOGIN
+// @desc Login
 // @route POST /auth
-// @access PUBLIC
+// @access Public
 const login = asyncHandler(async (req, res) => {
 
     const { username, password } = req.body
 
     if (!username || !password) {
         return res.status(400).json({ message: 'These fields are required' })
-    }
+    } // required
 
     const foundUser = await User.users.findOne({ username }).exec()
-
     if (!foundUser || !foundUser.active) {
         return res.status(401).json({ message: 'Unauthorised' })
-    }
+    } // if user is active
 
     const match = await bcrypt.compare(password, foundUser.password)
 
     if (!match) return res.status(401).json({ message: 'Unauthorised' })
 
+    // sign token - set expiry
     const accessToken = jwt.sign(
         {
             "UserInfo": {
@@ -41,12 +38,14 @@ const login = asyncHandler(async (req, res) => {
         { expiresIn: '15m' }
     )
 
+    // sign token - set expiry
     const refreshToken = jwt.sign(
         { "username": foundUser.username },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: '7d' }
     )
 
+    // set cookie value with refresh token
     res.cookie('jwt', refreshToken, {
         httpOnly: true, //accessible only by web server 
         secure: true, //https

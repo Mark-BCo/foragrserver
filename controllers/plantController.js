@@ -1,17 +1,15 @@
 const asyncHandler = require('express-async-handler');
 const { Types, mongoose } = require('mongoose');
-// Why have I done this >
 const Plants = {
     plants: require('../models/Plant'),
     setPlants: function (data) { this.plants = data }
 }
-
 const Crafts = {
     crafts: require('../models/Craft'),
     setCrafts: function (data) { this.plants = data }
 }
 
-// @desc GET plants
+// @desc GET get all plants
 // @route GET /plants
 const getAllPlants = asyncHandler(async (req, res) => {
     const plants = await Plants.plants.find().select().lean();
@@ -21,7 +19,7 @@ const getAllPlants = asyncHandler(async (req, res) => {
     res.json(plants);
 })
 
-// @desc GET plant by name
+// @desc GET plants by name
 // @route GET /plants/onePlant/:commonname
 const searchPlantByName = asyncHandler(async (req, res) => {
 
@@ -91,9 +89,8 @@ const updatePlants = asyncHandler(async (req, res) => {
 
 })
 
-// @desc Delete plants
+// @desc Delete plant
 // @route method:DELETE endpoint:/plants
-// @access Public
 const deletePlant = asyncHandler(async (req, res) => {
 
     const { id } = req.body
@@ -116,6 +113,8 @@ const deletePlant = asyncHandler(async (req, res) => {
 
 })
 
+// @desc Delete plants
+// @route method:DELETE endpoint:/plants
 const deleteAllPlants = asyncHandler(async (req, res) => {
 
     const plantData = await Plants.plants.deleteMany().exec()

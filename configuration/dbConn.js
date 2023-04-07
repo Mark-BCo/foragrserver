@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-// CONNECT TO MONGODB THROUGH MONGOOSE CONNECTION
+// Database connection - used in fo-server.js - see .env
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.DB_URI)

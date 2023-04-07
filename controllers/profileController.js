@@ -2,7 +2,23 @@ const Profile = require('../models/Profile')
 const User = require('../models/user')
 const asyncHandler = require('express-async-handler');
 
+// multer is middleware for handling multipart/form data
+const multer = require('multer')
 
+// Storing the photo uploads in the disk storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/profile/')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    },
+})
+
+// returning the multer instance - multer is used in the createNewLocation function for uploding photos
+const upload = multer({ storage: storage })
+
+// Get the users profile
 const getUserProfile = asyncHandler(async (req, res) => {
     const profile = await Profile.find()
     if (!profile?.length) {
@@ -11,6 +27,7 @@ const getUserProfile = asyncHandler(async (req, res) => {
     res.json(profile);
 })
 
+// Get the users profile by ID
 const getUserProfileById = asyncHandler(async (req, res) => {
     const id = req.params.id
     const profile = await Profile.findById(id)
@@ -23,7 +40,7 @@ const getUserProfileById = asyncHandler(async (req, res) => {
 
 
 // This code watches for a change event in the user document and inserts the user document into the
-// profile document
+// profile document - currently not working, needs development
 let userDocumentId
 // create a change stream
 const changeStream = User.watch()
@@ -42,27 +59,62 @@ changeStream.on('change', async (change, req, res) => {
 // @route method:POST endpoint:/profile
 // @access Private
 const updateProfile = asyncHandler(async (req, res) => {
+
+    // File Upload promise
+    const file = await new Promise((resolve, reject) => {
+        upload.single('image')(req, res, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(req.file);
+            }
+        });
+    });
+
     const id = req.params.id
     const { bio, forage, craft, eat, lore} = req.body
-    Profile.findByIdAndUpdate(
-        id, 
-        {
-        bio: bio,
-        forage: forage, 
-        craft: craft,
-        eat: eat,
-        lore: lore
+
+    // Create a new profile model
+    const newLocation = await Profile.create({
+        id,
+        bio,
+        forage,
+        craft,
+        eat,
+        lore,
+        image: {
+            data: file.buffer,
+            contentType: file.mimetype,
         },
-            { new: true }
-    )
-    .then(updatedProfile => {
-      // handle the updated profile
-      console.log(updatedProfile);
     })
-    .catch(error => {
-      // handle the error
-      console.error(error);
-    });
+
+    // return the reponse
+    res.status(201).json(newLocation)
+
+
+
+
+
+    // Profile.findByIdAndUpdate(
+    //     id, 
+    //     {
+    //     bio: bio,
+    //     forage: forage, 
+    //     craft: craft,
+    //     eat: eat,
+    //     lore: lore,
+    //     file: file
+    //     },
+    //         { new: true }
+    // )
+    // .then(updatedProfile => {
+    //   // handle the updated profile
+    //   console.log(updatedProfile);
+    // })
+    // .catch(error => {
+    //   // handle the error
+    //   console.error(error);
+    // });
 })
 
 const deleteAllProfiles = asyncHandler(async (req, res) => {

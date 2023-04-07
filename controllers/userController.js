@@ -1,7 +1,7 @@
 // Async handler: Without the express-async-handler try catch blocks are required
 const asyncHandler = require('express-async-handler');
 
-// bcrypt [assword hashing function - https://codahale.com/how-to-safely-store-a-password/
+// bcrypt password hashing function - https://codahale.com/how-to-safely-store-a-password/
 const bcrypt = require('bcrypt');
 
 // Requiring the user model
@@ -33,6 +33,7 @@ const getSingleUser = asyncHandler(async (req, res) => {
     }
 })
 
+// get user by id
 const getUserById = async (req, res) => {
     const id = req.params.id;
     try {

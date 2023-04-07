@@ -19,7 +19,7 @@ const logEvents = async(message, logFileName) => {
 
 // This will log every request that comes in
 // It may be useful to add conditions in here - for example only log it if 
-// the request is notcoming from our own url or if it's specific requests
+// the request is not coming from our own url or if it's specific requests
 const logger = (req, res, next) => {
     logEvents(`${req.method}\t${req.url}\t${req.headers.origin}`, 'reqLog.log');
     //console log the requests

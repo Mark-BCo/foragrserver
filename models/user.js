@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-// User data model
-// See 'Model.MD' file in this folder 1 - 4
+// default role: "User" roles set in application
 const userSchema = new mongoose.Schema ({
     username: {
         type: String,
@@ -23,7 +22,6 @@ const userSchema = new mongoose.Schema ({
         type: String,
         required: true
     },
-    // Decided that default role is User - Administrators and Managers are capable of setting roles in the application
     roles: {
             type: [String],
             default: ["User"]

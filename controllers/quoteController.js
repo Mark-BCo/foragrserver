@@ -31,6 +31,7 @@ const createNewQuote = asyncHandler(async (req, res) => {
 
 })
 
+// delete all quotes
 const deleteAllQuotes = asyncHandler(async (req, res) => {
 
     const quoteData = await Quote.deleteMany().exec()

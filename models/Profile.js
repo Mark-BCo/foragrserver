@@ -25,7 +25,11 @@ const ProfileSchema = new mongoose.Schema({
     lore: {
         type: Boolean,
         default: false
-    }
-})
+    },
+    image: {
+        data: Buffer,
+        contentType: String
+      }
+}, {timestamp: true})
 
 module.exports = mongoose.model('profile', ProfileSchema);

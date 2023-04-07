@@ -1,10 +1,6 @@
+// Allowed URL
 const allowedOrigins = [
-
-    // ALLOWED URL'S - change origins at deployment
-    // 'http://localhost:3000', // remove at deployment
-    // 'https://www.foragr.com',
-    // 'https://foragr.com',
+    // 'http://localhost:3000', // development URL
     'https://foragr.onrender.com',
 ]
-
 module.exports = allowedOrigins;
