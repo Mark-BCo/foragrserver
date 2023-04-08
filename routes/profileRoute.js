@@ -5,11 +5,10 @@ const profileController = require('../controllers/profileController')
 router.route('/')
     .get(profileController.getUserProfile)
     .delete(profileController.deleteAllProfiles)
-    .post(profileController.updateProfile)
 
-// router.route('/:id')
-//     .patch(profileController.updateProfile)
-//     .get(profileController.getUserProfileById)
+router.route('/:id')
+    .patch(profileController.updateProfile)
+    .get(profileController.getUserProfileById)
 
 
 module.exports = router

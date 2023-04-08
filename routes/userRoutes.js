@@ -16,6 +16,9 @@ router.route('/singleuser')
 router.route('/:username')
     .get(userController.getUserByName)
 
+router.route('/role/:id')
+    .get(userController.getUserByRole)
+
 router.route('/:id')
     .get(userController.getUserById)
 

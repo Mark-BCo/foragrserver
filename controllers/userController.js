@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 
 // Requiring the user model
 const User = require('../models/user')
+const Profile = require('../models/Profile')
 
 // @desc get all users
 // @route method:GET endpoint:/user
@@ -46,6 +47,32 @@ const getUserById = async (req, res) => {
         }
     } catch (error) {
         res.status(500).json(error);
+    }
+}
+
+// @desc get user by professional role and matching to user profile
+// @route method:GET endpoint:/user/role/:id
+// @access Private
+const getUserByRole = async (req, res) => {
+
+    const user = await User.find({ roles: 'Professional' }).select('-password').exec()
+
+    const { id } = req.body
+
+    const profileId = await Profile.findById(id).exec()
+    const userId = await User.findById(id).select('-password').exec()
+
+    const profileObject = { id }
+    const userObject = { id }
+
+    console.log("Profile: ", profileId)
+
+    if (profileObject.id === userObject.id) {
+        console.log(userId)
+        res.status(200).json(profileId)
+    } else {
+        console.log("Profiles do not match")
+
     }
 }
 
@@ -164,5 +191,22 @@ module.exports = {
     deleteUser,
     getSingleUser,
     getUserByName,
-    getUserById
+    getUserById,
+    getUserByRole
 }
+
+// Testing for get user by role
+    // console.log("Profile ID: ", profileObject)
+    // console.log("User ID: ", userObject)
+    // console.log(user)
+    // const p = await Profile.find(profileObject)
+    // console.log(p)
+    // console.log("User ID 2: ", userId)
+    // console.log("User: ", user)
+    // console.log("Profile: ", profileId)
+    // if (user) {
+    //     res.status(200).json(user)
+
+    // } else {
+    //     res.status(404).json("Role does not exist")
+    // }
