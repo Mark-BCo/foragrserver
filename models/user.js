@@ -32,7 +32,7 @@ const userSchema = new mongoose.Schema ({
     },
     // jwt refresh token for https authorisation
     refreshToken: String,
-})
+}, {timestamp: true})
 
 module.exports = mongoose.model('users', userSchema);
 
