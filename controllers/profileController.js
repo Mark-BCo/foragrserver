@@ -3,6 +3,7 @@ const User = require('../models/user')
 const asyncHandler = require('express-async-handler');
 
 // multer is middleware for handling multipart/form data
+// This is used for uploading user profile pictures in the updateProfile function.
 const multer = require('multer')
 
 // Storing the photo uploads in the disk storage
@@ -39,16 +40,45 @@ const getUserProfileById = asyncHandler(async (req, res) => {
 })
 
 
-// This code watches for a change event in the user document and inserts the user document into the
-// profile document - currently not working, needs development
+// This code watches for a change event in the user document and attempts to create and update the profile document with the user object
+// Currently not working, needs development - prevents a previous bug where a duplicate key was being created from the chnage stream event
+// The goal here is to create a profile each time a new user is registered which can then be updated by the user at any time
 // let userDocumentId
 // // create a change stream
 const changeStream = User.watch()
 // listen to the change stream a create a new profile
 changeStream.on('change', async (change, req, res) => {
     if (change.operationType === 'insert') {
-        const newProfile = change.fullDocument
-        await Profile.create(newProfile)
+
+        const userId = change.fullDocument
+
+        const createProfile = asyncHandler(async(req, res) => {
+            const id = userId
+            const userName = JSON.stringify(id.username)
+
+            const username = userName
+            const bio = ''
+            const forage = true
+            const craft = true
+            const eat = true
+            const lore = true
+            // const { username, bio, forage, craft, eat, lore } = req.body
+
+            User.findById(id).select('-password').exec()
+
+            const userIdOb = { id }
+            console.log(userIdOb)
+
+            if (id === userIdOb) {
+                
+                const profileObject = {id: id, username, bio, forage, craft, eat, lore}
+                const profile = await Profile.create(profileObject)
+
+            console.log(profile)
+
+            }
+        })
+        createProfile()
         // console.log(newProfile)
         // userDocumentId = newProfile._id
     }
