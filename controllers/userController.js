@@ -6,7 +6,25 @@ const bcrypt = require('bcrypt');
 
 // Requiring the user model
 const User = require('../models/user')
-const Profile = require('../models/Profile')
+// const Profile = require('../models/Profile');
+// const { Types } = require('mongoose');
+
+// multer is middleware for handling multipart/form data
+// This is used for uploading user profile pictures in the updateProfile function.
+const multer = require('multer')
+
+// Storing the photo uploads in the disk storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/profile/')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname)
+    },
+})
+
+// returning the multer instance - multer is used in the updateUser function for uploading photos
+const upload = multer({ storage: storage })
 
 // @desc get all users
 // @route method:GET endpoint:/user
@@ -34,7 +52,6 @@ const getSingleUser = asyncHandler(async (req, res) => {
     }
 })
 
-// get user by id
 const getUserById = async (req, res) => {
     const id = req.params.id;
     try {
@@ -50,30 +67,17 @@ const getUserById = async (req, res) => {
     }
 }
 
-// @desc get user by professional role and matching to user profile
-// @route method:GET endpoint:/user/role/:id
-// @access Private
 const getUserByRole = async (req, res) => {
 
-    const user = await User.find({ roles: 'Professional' }).select('-password').exec()
+    const user = await User.find({ roles: 'Manager' }).select('-password').exec()
 
-    const { id } = req.body
+    if (user) {
+        res.status(200).json(user)
 
-    const profileId = await Profile.findById(id).exec()
-    const userId = await User.findById(id).select('-password').exec()
-
-    const profileObject = { id }
-    const userObject = { id }
-
-    console.log("Profile: ", profileId)
-
-    if (profileObject.id === userObject.id) {
-        console.log(userId)
-        res.status(200).json(profileId)
     } else {
-        console.log("Profiles do not match")
-
+        res.status(404).json("Role does not exist")
     }
+
 }
 
 // @desc GET user by name
@@ -134,7 +138,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 // @access Private
 const updateUser = asyncHandler(async (req, res) => {
 
-    const { id, username, roles, active, password } = req.body
+    const { id, username, roles, active, password, bio, forage, craft, eat, lore, isProfessional } = req.body
 
     if (!id || !username || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
         return res.status(400).json({ message: 'All fields are required' })
@@ -157,14 +161,67 @@ const updateUser = asyncHandler(async (req, res) => {
     user.username = username
     user.roles = roles
     user.active = active
+    user.bio = bio
+    user.craft = craft
+    user.forage = forage
+    user.eat = eat
+    user.lore = lore
+    user.isProfessional = isProfessional
 
     if (password) {
         user.password = await bcrypt.hash(password, 10) // Salt rounds
     }
-    
+
     const updatedUser = await user.save()
 
     res.json({ message: `Updated ${updatedUser.username} updated` })
+})
+
+// @desc Update a user
+// @route method:PATCH endpoint:/user
+// @access Private
+const updateUserImage = asyncHandler(async (req, res) => {
+
+    // File Upload promise
+    const file = await new Promise((resolve, reject) => {
+        upload.single('image')(req, res, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(req.file);
+            }
+        });
+    });
+
+    const id = req.params.id;
+
+    const user = await User.findById(id).exec();
+
+    console.log(user)
+
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' });
+    }
+
+    const { username } = req.body
+
+    // Lean to not get the entire document - we are only checking for a user name
+    // Collation and the .locale property here checks for case insenisivity - see docs @
+    // https://www.mongodb.com/docs/manual/reference/collation-locales-defaults/
+    const duplicate = await User.findOne({ username }).collation({ locale: 'en', strength: 2 }).lean().exec();
+
+    if (duplicate && duplicate?._id.toString() !== id) {
+        return res.status(409).json({ message: 'Duplicate username' });
+    }
+
+    user.image = {
+        data: file.buffer,
+        contentType: file.mimetype,
+      }
+
+    const updatedUser = await user.save();
+
+    res.json({ message: `Updated ${updatedUser.username}'s profile image` });
 })
 
 // @desc Delete a User
@@ -192,21 +249,51 @@ module.exports = {
     getSingleUser,
     getUserByName,
     getUserById,
-    getUserByRole
+    getUserByRole,
+    updateUserImage
 }
 
-// Testing for get user by role
+
+// Trying to fins profile by user id
+
+    // const  {id}  = req.body
+
+    // console.log("id: ", id)
+
+    // const profileId = await Profile.find({user: user.id}).exec()
+
+    // console.log(profileId.username)
+
+
+    // // const { id, bio } = req.body
+
+    // // const profileId = await Profile.findById(id).exec()
+
+    // const profileObject = { id, bio }
+    // const userObject = { id }
+
+    // // console.log("User: ", userId)
+    // console.log("Profile: ", profileId)
+
     // console.log("Profile ID: ", profileObject)
-    // console.log("User ID: ", userObject)
-    // console.log(user)
+    // // console.log("User ID: ", userObject)
+
+    // // console.log(user)
+
+    // if (profileObject.id === userObject.id) {
+    //     console.log(profileObject)
+    //     // res.status(200).json(profileId)
+    // } else {
+    //     console.log("No")
+
+    // }
+
+
     // const p = await Profile.find(profileObject)
+
     // console.log(p)
+
     // console.log("User ID 2: ", userId)
+
     // console.log("User: ", user)
     // console.log("Profile: ", profileId)
-    // if (user) {
-    //     res.status(200).json(user)
-
-    // } else {
-    //     res.status(404).json("Role does not exist")
-    // }

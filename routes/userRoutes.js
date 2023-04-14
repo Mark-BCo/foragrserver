@@ -13,16 +13,19 @@ router.route('/')
 router.route('/singleuser')
     .get(userController.getSingleUser)
 
+router.route('/role')
+    .get(userController.getUserByRole)
+
 router.route('/:username')
     .get(userController.getUserByName)
-
-router.route('/role/:id')
-    .get(userController.getUserByRole)
 
 router.route('/:id')
     .get(userController.getUserById)
 
+router.route('/:id/image')
+    .patch(userController.updateUserImage)
 
-router.get('/', (req, res) => res.send)
+
+// router.get('/', (req, res) => res.send)
 module.exports = router
 
