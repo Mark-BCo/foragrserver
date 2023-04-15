@@ -57,7 +57,7 @@ const createNewLocation = asyncHandler(async (req, res) => {
     });
 
     // location body
-    const { username, name, location, commonname } = req.body
+    const { username, name, location, commonname, plantdetail } = req.body
 
     // Testing Only
     // const a = (typeof name)
@@ -79,6 +79,7 @@ const createNewLocation = asyncHandler(async (req, res) => {
             coordinates: [latitude, longitude],
         },
         commonname,
+        plantdetail,
         image: {
             data: file.buffer,
             contentType: file.mimetype,

@@ -24,10 +24,14 @@ const LocationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  plantdetail: {
+    type: String,
+    required: true
+  },
   image: {
     data: Buffer,
     contentType: String
-  }
+  },
 }, {timestamps: true});
 
 module.exports = mongoose.model('Location', LocationSchema);
